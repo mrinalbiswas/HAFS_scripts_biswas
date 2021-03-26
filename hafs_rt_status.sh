@@ -74,6 +74,21 @@ cd ${HAFS_dir}/rocoto
        echo "ROCOTO SAYS COMPLETION TASK DID NOT SUCCEED"
       fi
 
+    if [[ $if_complete == "1" ]]; then
+       post_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_post.log|tail -1`
+       prod_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_product.log|tail -1`
+        if [[ $post_log == "+ exit 0" ]]; then
+           echo "POST RAN TILL COMPLETION"
+          else
+           echo "POST DID NOT RAN TILL COMPLETION"
+        fi
+        if [[ $prod_log == "+ exit 0" ]]; then
+           echo "PRODUCT RAN TILL COMPLETION"
+          else
+           echo "PRODUCT DID NOT RAN TILL COMPLETION"
+        fi
+    fi
+
     if [[ $dynf_files_cnt == "5" && $phyf_files_cnt == "5" ]]; then
      echo "ALL DYN AND PHY FILES PRESENT"
       else
@@ -94,12 +109,16 @@ cd ${HAFS_dir}/rocoto
 
     if [[ $if_complete == "1" ]]; then
        if [[ $dynf_files_cnt == "5" && $phyf_files_cnt == "5" ]]; then
-          if [[ -e ${storm1_done} && -e ${atcfunix} && -e ${hafsprs_synoptic} ]]; then
+       if [[ -e ${storm1_done} && -e ${atcfunix} && -e ${hafsprs_synoptic} ]]; then
+       if [[ $post_log == "+ exit 0" ]]; then
+       if [[ $prod_log == "+ exit 0" ]]; then
          echo "REGRESSION TEST PASSED"
       else
          echo "REGRESSION TEST FAILED"
-          fi
-      fi
+       fi
+       fi
+       fi
+       fi
     fi
 
 done
