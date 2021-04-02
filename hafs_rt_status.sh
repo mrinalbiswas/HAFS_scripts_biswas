@@ -1,23 +1,24 @@
 #!/bin/sh
 # This script may be used to check if the Regression Test for the HAFS system
-# passed or not. The User need to specify the top level HAFS code (HAFS_dir)  
-# and output (HAFS_out) directories within the script.
+# passed or not. The User need to specify the HAFS code directory (HAFS_dir)  
+# (usually HOMEhafs) and output (HAFS_out) directories (usually CDSCRUB) below.
 # The script lists the *.xml files under $HAFS_dir/rocoto directory and gets 
 # the different configuration names.  
-# Output files checked by the script:
+# The script looks for:
 # 1. storm1.done 2. *atcfunix.all 3. hafsprs.synoptic.f012.grb2
-# 4. dynf012.nc 5. phyf012.nc 6. Counts the number of dyn and phy files
-# 5. hycominit2.done for coupled runs 6. Check for exit 0 in post and prod log files 
+# 4. dynf012.nc 5. phyf012.nc 6. the number of dyn and phy files
+# 5. hycominit2.done for coupled runs 6. exit 0 in post and prod log files 
+# 7. SUCCEEDED for completion task 
 
-# Author Mrinal Biswas DTC/NCAR
-# biswas@ucar.edu
+# Author: Mrinal Biswas DTC/NCAR
+# Do not contact: biswas@ucar.edu
 
 
 
 #set -x
 
-HAFS_dir=/work/noaa/dtc-hwrf/mbiswas/HAFS_git
-HAFS_out=/work/noaa/dtc-hwrf/mbiswas
+HAFS_dir=/your/HAFS/code/directory
+HAFS_out=/your/HAFS/scrub/directory
 
 expt_name="`echo $(basename ${HAFS_dir})`"
 echo $expt_name
@@ -75,8 +76,8 @@ echo `pwd`
       fi
 
     if [[ $if_complete == "1" ]]; then
-       post_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_post.log|tail -1`
-       prod_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_product.log|tail -1`
+       post_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_post.log|grep "exit 0"`
+       prod_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_product.log|grep "exit 0"`
         if [[ $post_log == "+ exit 0" ]]; then
            echo "POST RAN TILL COMPLETION"
           else
@@ -113,9 +114,9 @@ echo `pwd`
        if [[ -e ${storm1_done} && -e ${atcfunix} && -e ${hafsprs_synoptic} ]]; then
        if [[ $post_log == "+ exit 0" ]]; then
        if [[ $prod_log == "+ exit 0" ]]; then
-         echo "REGRESSION TEST PASSED"
+         echo "REGRESSION TEST PASSED!! YAYYY!!"
       else
-         echo "REGRESSION TEST FAILED"
+         echo "REGRESSION TEST FAILED!! IT'S NOT YOUR FAULT!!"
        fi
        fi
        fi
