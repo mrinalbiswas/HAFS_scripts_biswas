@@ -7,7 +7,7 @@
 # Output files checked by the script:
 # 1. storm1.done 2. *atcfunix.all 3. hafsprs.synoptic.f012.grb2
 # 4. dynf012.nc 5. phyf012.nc 6. Counts the number of dyn and phy files
-# 5. hycominit2.done for coupled runs  
+# 5. hycominit2.done for coupled runs 6. Check for exit 0 in post and prod log files 
 
 # Author Mrinal Biswas DTC/NCAR
 # biswas@ucar.edu
@@ -20,8 +20,10 @@ HAFS_dir=/work/noaa/dtc-hwrf/mbiswas/HAFS_git
 HAFS_out=/work/noaa/dtc-hwrf/mbiswas
 
 expt_name="`echo $(basename ${HAFS_dir})`"
+echo $expt_name
 
-for i in ${HAFS_dir}/rocoto/*.xml; do
+cd ${HAFS_dir}/rocoto
+for i in *.xml; do
 
   file_noext=`echo $i |cut -f1 -d '.'`
   storm_init=`echo $i|rev|cut -f1 -d'-'|cut -f2 -d '.'|rev`
@@ -30,9 +32,9 @@ for i in ${HAFS_dir}/rocoto/*.xml; do
 
 echo "Running ${HAFS_dir}/${expt_name}${expts}-${sid}-${storm_init} configuration"
 
-cd ${HAFS_dir}/rocoto
-
+echo `pwd`
   rocotostat -d hafs-${expt_name}${expts}-${sid}-${storm_init}.db -w hafs-${expt_name}${expts}-${sid}-${storm_init}.xml
+
   if_complete=`rocotostat -d hafs-${expt_name}${expts}-${sid}-${storm_init}.db -w hafs-${expt_name}${expts}-${sid}-${storm_init}.xml|grep -e completion |grep -e SUCCEEDED|wc -l`
   storm1_done=${HAFS_out}/${expt_name}${expts}/com/${storm_init}/${sid}/storm1.done
   atcfunix=$(/usr/bin/find ${HAFS_out}/${expt_name}${expts}/com/${storm_init}/${sid} -type f -name "*atcfunix.all")
@@ -47,7 +49,6 @@ cd ${HAFS_dir}/rocoto
 # Check if HYCOM init ran successfully or not
 
     if [[ `echo $i|grep "regional_static_cplocean3"|wc -l` == "1" ]]; then
-      cd ${HAFS_out}/${expt_name}_rt_regional_static_cplocean3/com/${storm_init}/${sid}
         hafs_hycom_cnt=`cat ${HAFS_out}/${expt_name}${expts}/com/${storm_init}/${sid}/*hycominit2.done`
       if [[ $hafs_hycom_cnt == "hycominit2 done for this cycle" ]]; then
            echo "HYCOM INIT SUCCESSFUL"
@@ -57,7 +58,6 @@ cd ${HAFS_dir}/rocoto
     fi
    
     if [[ `echo $i|grep "regional_cplocean2"|wc -l` == "1" ]]; then
-      cd ${HAFS_out}/${expt_name}_rt_regional_cplocean2/com/${storm_init}/${sid}
         hafs_hycom_cnt=`cat ${HAFS_out}/${expt_name}${expts}/com/${storm_init}/${sid}/*hycominit2.done`
       if [[ $hafs_hycom_cnt == "hycominit2 done for this cycle" ]]; then
            echo "HYCOM INIT SUCCESSFUL"
@@ -106,6 +106,7 @@ cd ${HAFS_dir}/rocoto
       else
        echo "DID NOT FIND ALL THE DYN AND PHY FILES IN THE FORECAST DIRECTORY"
     fi
+
 
     if [[ $if_complete == "1" ]]; then
        if [[ $dynf_files_cnt == "5" && $phyf_files_cnt == "5" ]]; then
