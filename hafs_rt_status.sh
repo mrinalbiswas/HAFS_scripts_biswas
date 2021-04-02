@@ -75,6 +75,8 @@ echo `pwd`
        echo "ROCOTO SAYS COMPLETION TASK DID NOT SUCCEED"
       fi
 
+# Check the post and product log files
+
     if [[ $if_complete == "1" ]]; then
        post_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_post.log|grep "exit 0"`
        prod_log=`cat ${HAFS_out}/${expt_name}${expts}/${storm_init}/${sid}/hafs_product.log|grep "exit 0"`
@@ -90,11 +92,15 @@ echo `pwd`
         fi
     fi
 
+# Count the number of dyn and phy files
+
     if [[ $dynf_files_cnt == "5" && $phyf_files_cnt == "5" ]]; then
      echo "ALL DYN AND PHY FILES PRESENT"
       else
      echo "ALL DYN AND PHY FILES NOT PRESENT"
     fi
+
+# Check storm1.done atcfunix and hafsprs.synoptic files
 
     if [[ -e ${storm1_done} && -e ${atcfunix} && -e ${hafsprs_synoptic} ]]; then
          echo "FOUND STORM1.DONE, TRACKER OUTPUT, HAFSPRS.SYNOPTIC FILES "
@@ -102,12 +108,15 @@ echo `pwd`
          echo "STORM1.DONE, TRACKER OUTPUT, HAFSPRS.SYNOPTIC FILES DO NOT EXIST" 
     fi
 
+# Check to see if dyn and phy files are present
+
     if [[ -f "${dynf_files}" && -f "${phyf_files}" ]]; then
        echo "FOUND ALL DYN AND PHY FILES IN THE FORECAST DIRECTORY"
       else
        echo "DID NOT FIND ALL THE DYN AND PHY FILES IN THE FORECAST DIRECTORY"
     fi
 
+# Check if everything passed 
 
     if [[ $if_complete == "1" ]]; then
        if [[ $dynf_files_cnt == "5" && $phyf_files_cnt == "5" ]]; then
